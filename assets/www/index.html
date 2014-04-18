@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>Random</title>
+	
+	
+	
+	<link rel="stylesheet" href="jquery.mobile.min.css">
+	<script src="jquery.min.js"></script>
+	<script src="jquery.mobile.min.js"></script>
+
+	<script type="text/javascript">
+		function killit(item){
+			var store = JSON.parse(localStorage['item-list']);
+			store = $.grep(store, function(i) {
+				return i.title != $(item).find("a").text();
+			});
+			localStorage['item-list'] = JSON.stringify(store);
+			
+			$(item).remove();
+			$('#item-list').listview('refresh');
+		}
+		$(function(){
+			$('#ok').click(function() {
+					var item = $('#item').val();
+					$('#item').val('');
+					if(item != '') {
+							var store = JSON.parse(localStorage['item-list']);
+							store.push({title: item});
+							localStorage['item-list'] = JSON.stringify(store);
+							$('#item-list').append('<li onclick="killit(this)"><a>' + item + '</a></li>').listview('refresh');
+							$( "#popupAdd" ).popup("close");
+					}
+			});
+
+			$('#random').click(function(){
+				var list = $('li');
+				if(list){
+					var randomIndex = Math.floor(Math.random(new Date().getSeconds()) * list.length);  
+					$('#popupResult p').text($(list[randomIndex]).find("a").text());
+				}
+			});
+
+
+			if(!localStorage['item-list'])
+				localStorage['item-list'] = JSON.stringify([]);
+			else{
+				var store = JSON.parse(localStorage['item-list']);
+				$.each(store, function() {
+				  $('#item-list').append('<li onclick="killit(this)"><a>' + this.title + '</a></li>').listview('refresh');
+				});
+			}
+		});
+	</script>
+	 
+</head>
+<body>
+<!-- Home -->
+<div data-role="page" id="page1">
+		<div data-theme="a" data-role="header" data-position="fixed">
+				<a href="#popupAdd" data-rel="popup" data-position-to="window" data-role="button" 
+				data-inline="true" data-icon="plus" data-theme="a" data-transition="pop" class="ui-btn-right">Add</a>
+				<h3>
+						Random
+				</h3>
+		</div>
+		<div data-role="content">
+				<a id="random" href="#popupResult" data-rel="popup" data-role="button" data-transition="slidedown">Go</a>
+				<ul id="item-list" data-role="listview" data-divider-theme="b" data-inset="true" data-icon="delete">
+				</ul>
+		</div>
+		<div data-role="popup" id="popupAdd" data-theme="a" class="ui-corner-all">
+				<div style="padding:10px 20px;">
+						<h3>Add a new item</h3>
+						<label for="un" class="ui-hidden-accessible">Item:</label>
+						<input type="text" name="item" id="item" value="" placeholder="item" data-theme="a">
+						<button id="ok" data-theme="b" data-icon="check" data-rel="back">OK</button>
+				</div>
+		</div>
+		<div data-role="popup" id="popupResult" class="ui-content" data-theme="e" >
+				<p>This is a completely basic popup, no options set.</p>
+		</div>
+</div>
+</body>
+</html>
